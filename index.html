@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wirtualna Stolarnia</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="./W.png">
+</head>
+<body>
+
+    <div class="signup-container">
+        <h2 id="title">Zarejestruj się</h2>
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="password" id="password" placeholder="Hasło">
+        <input type="submit" id="signUp" value="Zarejestruj się" name="signup-submit" style="width:130px; font-size: 15px;">
+        <h3 id="title">Masz już konto? <a href="login.html" style="color:rgb(197, 183, 164)">Zaloguj się tutaj</a></h3>
+    </div>
+    
+</body>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, set, ref } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8gGTd9l9-OFjJRJTaKwpbvO18cirEXCI",
+      authDomain: "wirtualna-stolarnia-7df3c.firebaseapp.com",
+      databaseURL: "https://wirtualna-stolarnia-7df3c-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "wirtualna-stolarnia-7df3c",
+      storageBucket: "wirtualna-stolarnia-7df3c.appspot.com",
+      messagingSenderId: "910342092496",
+      appId: "1:910342092496:web:bccff19f3df925ec8e10d5",
+      measurementId: "G-GHT85THHVZ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const auth = getAuth();
+
+    signUp.addEventListener('click', (e) => {
+        let email = document.getElementById('email').value 
+        let password = document.getElementById('password').value
+
+        createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            set(ref(database, 'users/' + user.uid),{
+                email: email,
+                password: password,
+                role: 'user'
+            })
+            alert('Użytkownik utworzony!')
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorMessage)
+        });
+    });
+</script>
+</html>

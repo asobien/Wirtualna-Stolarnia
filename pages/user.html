@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wirtualna Stolarnia</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="./W.png">
+</head>
+<body>
+
+<menu style="position:fixed; width:100%; height:80px; background-color: rgb(201, 156, 108); z-index:1; margin:0 auto; display:flex; justify-content: space-between; align-items: center;">
+  <img src="logo.png" style="width:250px;">
+</menu>
+
+<div class="container">
+  <h1>Wirtualna Stolarnia</h1>
+  <div class="input-btn">
+    <input type="text" id="searchInput" placeholder="Wyszukaj numer seryjny...">
+    <div class="dropdown">
+      <button class="dropbtn">Sortuj wg</button>
+      <div class="dropdown-content">
+        <div class="checkbox-container" style="display:flex; flex-direction: column; ">
+          <label><input type="checkbox" id="sortSerialNumber"> Sortuj wg numeru seryjnego</label>
+          <label><input type="checkbox" id="sortSpecies"> Sortuj wg gatunku</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="records" class="record-container"></div>
+</div>
+
+<div id="addRecordModal1" class="modal">
+    <div class="modal-content">
+      <span class="close" style="display: none;">&times;</span>
+        <form id="addRecordForm">
+          <label>Numer seryjny:<input class="form_input" type="text" id="woodSerialNumber" placeholder="Numer Seryjny" required></label>
+          <label>Nazwa:<input class="form_input" type="text" id="woodName" placeholder="Nazwa"></label>
+          <label>Gatunek<input class="form_input" type="text" id="woodSpecies" placeholder="Gatunek" style="display: none;"></label>
+          <!-- <label>Typ:<input list="Types" class="form_input" type="text" id="woodType" placeholder="Typ (P lub D)" style="display: none;"></label> -->
+            <label for="select">Typ:<select name="typ" style="width:200px; border-radius:10px; height:30px; padding:5px;" id="woodType">
+              <option>Wybierz opcję</option>
+              <option value="Deska">Deska</option>
+              <option value="Plaster">Plaster</option>
+            </select></label>
+            <label>Kształt:<input class="form_input" type="text" id="woodShape" placeholder="Kształt" style="display: none;"></label>
+            <label>Data Zakupu:<input class="form_input" type="text" id="woodPurchaseDate" placeholder="Data Zakupu" style="display: none;"></label>
+            <label>Zakupione od:<input class="form_input" type="text" id="woodPurchasedFrom" placeholder="Zakupione od" style="display: none;"></label>
+            <label>Rok ścięcia:<input class="form_input" type="text" id="woodYearCut" placeholder="Rok Ścięcia" style="display: none;"></label>
+            <!-- <label>Wilgotność 1:<input class="form_input" type="text" id="woodMoisture1" placeholder="Wilgotność 1 (%)" style="display: none;"></label> -->
+            <!-- <label>Wilgotność 2:<input class="form_input" type="text" id="woodMoisture2" placeholder="Wilgotność 2 (%)" style="display: none;"></label> -->
+            <!-- <label>Wilgotność 3:<input class="form_input" type="text" id="woodMoisture3" placeholder="Wilgotność 3 (%)" style="display: none;"></label> -->
+            <!-- <label>Osoba mierząca:<input class="form_input" type="text" id="woodMeasurer" placeholder="Osoba mierząca" style="display: none;"></label> -->
+            <!-- <label>Wilgotnościomierz:<input class="form_input" type="text" id="woodMoistureMeter" placeholder="Wilgotnościomierz" style="display: none;"></label> -->
+            <label>Wysokość:<input class="form_input" type="text" id="woodHeight" placeholder="Wysokość" style="display: none;"></label>
+            <label>Szerokość:<input class="form_input" type="text" id="woodWidth" placeholder="Szerokość" style="display: none;"></label>
+            <label>Grubość:<input class="form_input" type="text" id="woodThickness" placeholder="Grubość" style="display: none;"></label>
+            <label>Średnica:<input class="form_input" type="text" id="woodDiameter" placeholder="Średnica" style="display: none;"></label>
+            <label>Zdjęcie poglądowe:<input type="file" class="form_input" id="image" style="display: none; border:none;"></label>
+            <label style="display:none;" id="add-measure-date">Data pomiaru:<input type="date" class="form_input" id="woodMeasureDate"></label>
+            <label style="display: none;" id="add-moisture4">Wilgotność 4:<input type="text" placeholder="Wilgotność 4" class="form_input" id="woodMoisture4"></label>
+            <label style="display: none;" id="add-moisture5">Wilgotność 5:<input type="text" placeholder="Wilgotność 5" class="form_input" id="woodMoisture5"></label>
+            <label style="display: none;" id="add-moisture6">Wilgotność 6:<input type="text" placeholder="Wilgotność 6" class="forn_input" id="woodMoisture6"></label>
+
+            <button id="add-moisture-btn">Dodaj pomiar wilgotności</button>
+            <button class="submit-btn" type="submit" style="display: none;">Dodaj rekord</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+
+<script>
+ const firebaseConfig = {
+      apiKey: "AIzaSyB8gGTd9l9-OFjJRJTaKwpbvO18cirEXCI",
+      authDomain: "wirtualna-stolarnia-7df3c.firebaseapp.com",
+      databaseURL: "https://wirtualna-stolarnia-7df3c-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "wirtualna-stolarnia-7df3c",
+      storageBucket: "wirtualna-stolarnia-7df3c.appspot.com",
+      messagingSenderId: "910342092496",
+      appId: "1:910342092496:web:bccff19f3df925ec8e10d5",
+      measurementId: "G-GHT85THHVZ"
+    };
+  const app = firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const storage = firebase.storage();
+</script>
+
+<script src="user_script.js"></script>
+</body>
+</html>

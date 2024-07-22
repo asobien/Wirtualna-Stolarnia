@@ -6,12 +6,18 @@
     <title>Wirtualna Stolarnia</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="W.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 <body>
 
-<menu style="position:fixed; width:100%; height:80px; background-color: rgb(201, 156, 108); z-index:1; margin:0 auto; display:flex; justify-content: space-between; align-items: center;">
-  <img src="logo.png" style="width:250px;">
-</menu>
+  <menu style="position:fixed; width:100%; height:80px; background-color: rgb(201, 156, 108); z-index:1; margin:0 auto; display:flex; justify-content: space-between; align-items: center;">
+    <img src="logo.png" style="width:250px;">
+    <a href="" style="margin-right:70px; text-decoration-line: none;">
+      <i class="fa-solid fa-heart fa-xl" style="color: #8c744a; margin-right:5px;"></i> <span id="favoritesCount">0</span>
+    </a>
+  </menu>
+  
 
 <div class="container">
   <h1>Wirtualna Stolarnia</h1>
@@ -68,9 +74,11 @@
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+  <script src="user_script.js"></script>
 
 <script>
  const firebaseConfig = {
@@ -85,7 +93,10 @@
     };
   const app = firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
+  const auth = firebase.auth(); // Dodaj tę linię, aby zainicjalizować auth
   const storage = firebase.storage();
+
+  
 </script>
 
 <script src="user_script.js"></script>

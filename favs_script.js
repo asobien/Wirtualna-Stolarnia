@@ -5,19 +5,18 @@ function getCurrentUserId() {
   
   let userFavorites = {};
   
-  // Function to initialize the application
+
   function initializeApp() {
     document.addEventListener("DOMContentLoaded", () => {
       auth.onAuthStateChanged((user) => {
         if (user) {
-          updateFavoritesCount(); // Update the favorites count initially
-          displayFavoriteRecordsOnly(); // Display favorite records after user logs in
+          updateFavoritesCount(); 
+          displayFavoriteRecordsOnly(); 
         }
       });
     });
   }
-  
-  // Function to display favorite records only
+
   function displayFavoriteRecordsOnly() {
     const recordsContainer = document.getElementById("favourite-records");
     recordsContainer.innerHTML = "";
@@ -27,12 +26,10 @@ function getCurrentUserId() {
       console.error("User is not logged in.");
       return;
     }
-  
-    // Fetch favorite records for the logged-in user
+    
     database.ref(`users/${userId}/favorites`).once('value', (favoritesSnapshot) => {
       const favorites = favoritesSnapshot.val() || {};
   
-      // Fetch all records
       database.ref("wood").once("value", (snapshot) => {
         snapshot.forEach((childSnapshot) => {
           const record = childSnapshot.val();
@@ -47,7 +44,6 @@ function getCurrentUserId() {
     });
   }
   
-  // Function to create a record element
   function createRecordElement(record, key) {
     const recordDiv = document.createElement("div");
     recordDiv.classList.add("record");
@@ -81,8 +77,7 @@ function getCurrentUserId() {
   
     return recordDiv;
   }
-  
-  // Function to show details modal
+
   function showDetailsModal(recordId) {
     const recordRef = database.ref("wood/" + recordId.toString());
     recordRef.once("value", (snapshot) => {
@@ -117,7 +112,7 @@ function getCurrentUserId() {
     });
   }
   
-  // Function to show modal with content
+
   function showModalWithContent(content) {
     const modal = document.createElement("div");
     modal.classList.add("modal");
@@ -145,7 +140,7 @@ function getCurrentUserId() {
     });
   }
   
-  // Function to handle like button click
+
   function likeBtn(event) {
     const userId = getCurrentUserId();
     if (!userId) {
@@ -181,7 +176,7 @@ function getCurrentUserId() {
     }
   }
   
-  // Function to update favorites count
+
   function updateFavoritesCount() {
     const userId = getCurrentUserId();
     if (!userId) {
@@ -198,6 +193,6 @@ function getCurrentUserId() {
     });
   }
   
-  // Initialize the application
+
   initializeApp();
   

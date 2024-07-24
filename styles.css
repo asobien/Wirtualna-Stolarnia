@@ -213,7 +213,6 @@ button {
 }
 
 button:hover {
-  background-color: #b78059;
   transition: ease;
   transition-duration: 0.5s;
 }
@@ -327,3 +326,10 @@ button:hover {
 #icon{
   cursor:pointer;
 }
+
+.edit-details-btn{
+  background-color:transparent;
+  border:none;
+}
+
+

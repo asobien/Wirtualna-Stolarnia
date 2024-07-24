@@ -38,7 +38,6 @@ body {
     background-color: #dabba9;
   }
   
-/*Container with inputs and button*/
 
   .login-form {
     display: flex;
@@ -54,12 +53,4 @@ body {
     color:rgb(198, 178, 159);
   }
 
-/*Login container button*/
 
-  button {
-    border-radius:10px;
-    width:100px;
-    height:40px;
-    cursor:pointer;
-    background-color: #ceae9a;
-  }

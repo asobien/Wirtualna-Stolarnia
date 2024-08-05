@@ -87,10 +87,7 @@ function displayRecords() {
       recordsArray.push({ key: childSnapshot.key, ...record });
     });
 
-    // Zastosuj filtry
     recordsArray = filterRecords(recordsArray);
-
-    // Wyświetl filtorwane rekordy
     recordsArray.forEach((record) => {
       const recordDiv = createRecordElement(record, record.key);
       recordsContainer.appendChild(recordDiv);

@@ -23,16 +23,69 @@
   <h1>Wirtualna Stolarnia</h1>
   <div class="input-btn">
     <input type="text" id="searchInput" placeholder="Wyszukaj numer seryjny...">
-    <div class="dropdown">
-      <button class="dropbtn">Sortuj wg</button>
-      <div class="dropdown-content">
-        <div class="checkbox-container" style="display:flex; flex-direction: column; ">
-          <label><input type="checkbox" id="sortSerialNumber"> Sortuj wg numeru seryjnego</label>
-          <label><input type="checkbox" id="sortSpecies"> Sortuj wg gatunku</label>
-        </div>
-      </div>
-    </div>
+    <button class="filtr-btn" id="filtr-btn">Filtry</button>
   </div>
+
+  <div class="filters" style="color:rgb(219, 179, 127); display:flex; flex-direction:column; justify-content: left; margin:30px;">
+    <label for="species-select">Gatunek: </label><select id="species-select" style="width:150px; height:30px; font-size: 15px; margin:10px; border-radius:8px;">
+      <option value="Gatunek">Gatunek</option>
+      <option value="Buk">Buk</option>
+      <option value="Czereśnia">Czereśnia</option>
+      <option value="Dąb">Dąb</option>
+      <option value="Głóg">Głóg</option>
+      <option value="Jabłoń">Jabłoń</option>
+      <option value="Jesion">Jesion</option>
+      <option value="Klon Polny">Klon Polny</option>
+      <option value="Lipa">Lipa</option>
+      <option value="Modrzew">Modrzew</option>
+      <option value="Olcha">Olcha</option>
+      <option value="Sosna">Sosna</option>
+      <option value="Świerk">Świerk</option>
+      <option value="Akacja">Akacja</option>
+      <option value="Topola">Topola</option>
+      <option value="Dąb Czerwony">Dąb Czerwony</option>
+      <option value="Czereśnia dzika">Czereśnia dzika</option>
+    </select>
+
+    <label for="type-select">Typ: </label><select id="type-select" style="width:150px; height:30px; font-size: 15px; margin:10px; border-radius:8px;">
+      <option value="Typ">Typ</option>
+      <option value="Deska">Deska</option>
+      <option value="Plaster">Plaster</option>
+      <option value="Inne">Inne</option>
+      <option value="Belka">Belka</option>
+      <option value="Monolit">Monolit</option>
+      <option value="Czeczota">Czeczota</option>
+      <option value="Krążek">Krążek</option>
+    </select>
+
+    <label>Średnia wilgonotść:</label>
+    <div class="moisture-filter">
+      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <label>Wysokość:</label>
+    <div class="height-filter">
+      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <label>Szerokość:</label>
+    <div class="width-filter">
+      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <label>Grubość:</label>
+    <div class="thickness-filter">
+      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <button id="submit-filters" class="submit-filters" style="width:100px; height:30px; border-radius:10px; border:none; background-color: #d9a377; font-size:15px;">Filtruj</button>
+    
+  </div>
+
   <div id="records" class="record-container"></div>
 </div>
 

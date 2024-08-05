@@ -47,18 +47,23 @@ function getCurrentUserId() {
   function createRecordElement(record, key) {
     const recordDiv = document.createElement("div");
     recordDiv.classList.add("record");
+    let averageMoisture = Math.round((parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3) + '%';
+    record.averageMoisture = averageMoisture;
     recordDiv.innerHTML = `
-      <div class="record-info">
-        <span class="record-item"><strong>Numer Seryjny:</strong> ${record.serialNumber}</span> 
-        <span class="record-item"><strong>Gatunek:</strong> ${record.species}</span> 
-        <span class="record-item"><strong>Typ:</strong> ${record.type}</span>
+    <div class="record-info">
+      <span class="record-item"><strong>Numer Seryjny:</strong> ${record.serialNumber}</span> 
+      <span class="record-item"><strong>Gatunek:</strong> ${record.species}</span> 
+      <span class="record-item"><strong>Typ:</strong> ${record.type}</span>
+      <span class="record-item"><strong>Średnia wilgotność: </strong> ${record.averageMoisture}</span>
+      <span class="record-item"><strong>Wysokość: </strong> ${record.height}</span>
+      <span class="record-item"><strong>Szerokość: </strong> ${record.width}</span>
+      <span class="record-item"><strong>Grubość: </strong> ${record.thickness}</span>
       </div>
       <div id="zoom-cont" class="zoom-container"><img src="${record.imageUrl}" alt="Record Image" class="zoom-img" id="zoom-img" style="width:200px;"></div>
       <div class="more">
         <div id="record-menu" class="record-buttons">
           <button class="details-btn" data-id="${key}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
-              <path d="M48 80a48 48 0 1 1 96 0A48 48 0 1 1 48 80zM0 224c0-17.7 14.3-32 32-32H96c17.7 0 32 14.3 32 32V448h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H64V256H32c-17.7 0-32-14.3-32-32z"/>
             </svg>
           </button>
           <div class="wrapper">

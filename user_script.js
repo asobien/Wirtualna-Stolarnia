@@ -1,10 +1,7 @@
-function getCurrentUserId() {
-  const user = auth.currentUser;
-  return user ? user.uid : null;
-}
-
 let currentSort = null;
 let currentSearchQuery = '';
+let currentSpeciesFilter = 'Gatunek'; // Gatunek, który ma być filtrowany
+let currentTypeFilter = 'Typ'; // Typ, który ma być filtrowany
 let userFavorites = {};
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -17,31 +14,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   displayRecords();
 
-  document.getElementById("sortSerialNumber").addEventListener("change", () => {
-    if (document.getElementById("sortSerialNumber").checked) {
-      currentSort = "serialNumber";
-      document.getElementById("sortSpecies").checked = false;
-    } else {
-      currentSort = null;
-    }
-    sortRecords(currentSort, currentSearchQuery);
-  });
-
-  document.getElementById("sortSpecies").addEventListener("change", () => {
-    if (document.getElementById("sortSpecies").checked) {
-      currentSort = "species";
-      document.getElementById("sortSerialNumber").checked = false;
-    } else {
-      currentSort = null;
-    }
-    sortRecords(currentSort, currentSearchQuery);
-  });
-
   document.getElementById("searchInput").addEventListener("input", (event) => {
     currentSearchQuery = event.target.value.trim().toLowerCase();
-    sortRecords(currentSort, currentSearchQuery);
+    displayRecords();
+  });
+
+  document.getElementById("species-select").addEventListener("change", (event) => {
+    currentSpeciesFilter = event.target.value;
+    displayRecords();
+  });
+
+  document.getElementById("type-select").addEventListener("change", (event) => {
+    currentTypeFilter = event.target.value;
+    displayRecords();
   });
 });
+
+function getCurrentUserId() {
+  const user = auth.currentUser;
+  return user ? user.uid : null;
+}
 
 function loadUserFavorites() {
   const userId = getCurrentUserId();
@@ -59,7 +51,32 @@ function loadUserFavorites() {
   });
 }
 
-function sortRecords(sortBy, searchQuery) {
+function filterRecords(recordsArray) {
+  console.log("Current Filters:", {
+    species: currentSpeciesFilter,
+    type: currentTypeFilter,
+    searchQuery: currentSearchQuery,
+  });
+
+  return recordsArray.filter(record => {
+    const speciesMatch = currentSpeciesFilter === 'Gatunek' || record.species === currentSpeciesFilter;
+    const typeMatch = currentTypeFilter === 'Typ' || record.type === currentTypeFilter;
+    const searchQueryMatch = currentSearchQuery === '' ||
+      (record.name && record.name.toLowerCase().includes(currentSearchQuery)) ||
+      (record.serialNumber && record.serialNumber.toLowerCase().includes(currentSearchQuery));
+    
+    console.log(`Record ${record.serialNumber} matches filters:`, {
+      speciesMatch,
+      typeMatch,
+      searchQueryMatch
+    });
+
+    return speciesMatch && typeMatch && searchQueryMatch;
+  });
+}
+
+
+function displayRecords() {
   const recordsContainer = document.getElementById("records");
   recordsContainer.innerHTML = "";
 
@@ -67,52 +84,42 @@ function sortRecords(sortBy, searchQuery) {
     let recordsArray = [];
     snapshot.forEach((childSnapshot) => {
       const record = childSnapshot.val();
-      if (searchQuery) {
-        const recordName = record.name.toLowerCase();
-        const recordSerialNumber = record.serialNumber.toLowerCase();
-        if (!recordName.includes(searchQuery) && !recordSerialNumber.includes(searchQuery)) {
-          return;
-        }
-      }
       recordsArray.push({ key: childSnapshot.key, ...record });
     });
 
-    if (sortBy === "serialNumber") {
-      recordsArray.sort((a, b) => a.serialNumber.localeCompare(b.serialNumber));
-    } else if (sortBy === "species") {
-      recordsArray.sort((a, b) => {
-        const speciesComparison = a.species.localeCompare(b.species);
-        if (speciesComparison !== 0) return speciesComparison;
-        return a.serialNumber.localeCompare(b.serialNumber);
-      });
-    }
+    // Zastosuj filtry
+    recordsArray = filterRecords(recordsArray);
 
+    // Wyświetl filtorwane rekordy
     recordsArray.forEach((record) => {
       const recordDiv = createRecordElement(record, record.key);
       recordsContainer.appendChild(recordDiv);
     });
+  }).catch((error) => {
   });
 }
 
-function displayRecords() {
-  sortRecords(currentSort, currentSearchQuery);
-}
 
 function createRecordElement(record, key) {
   const recordDiv = document.createElement("div");
   recordDiv.classList.add("record");
+  let averageMoisture = Math.round((parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3) + '%';
+  record.averageMoisture = averageMoisture;
   recordDiv.innerHTML = `
     <div class="record-info">
       <span class="record-item"><strong>Numer Seryjny:</strong> ${record.serialNumber}</span> 
       <span class="record-item"><strong>Gatunek:</strong> ${record.species}</span> 
       <span class="record-item"><strong>Typ:</strong> ${record.type}</span>
+      <span class="record-item"><strong>Średnia wilgotność: </strong> ${record.averageMoisture}</span>
+      <span class="record-item"><strong>Wysokość: </strong> ${record.height}</span>
+      <span class="record-item"><strong>Szerokość: </strong> ${record.width}</span>
+      <span class="record-item"><strong>Grubość: </strong> ${record.thickness}</span>
     </div>
     <div id="zoom-cont" class="zoom-container"><img src="${record.imageUrl}" alt="Record Image" class="zoom-img" id="zoom-img" style="width:200px;"></div>
     <div class="more">
       <div id="record-menu" class="record-buttons">
         <button class="details-btn" data-id="${key}">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
-            <path d="M48 80a48 48 0 1 1 96 0A48 48 0 1 1 48 80zM0 224c0-17.7 14.3-32 32-32H96c17.7 0 32 14.3 32 32V448h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H64V256H32c-17.7 0-32-14.3-32-32z"/>
           </svg>
         </button>
         <div class="wrapper">
@@ -128,69 +135,7 @@ function createRecordElement(record, key) {
   detailsButton.addEventListener("click", () => {
     showDetailsModal(key);
   });
-
   return recordDiv;
-}
-
-function showDetailsModal(recordId) {
-  const recordRef = database.ref("wood/" + recordId.toString());
-  recordRef.once("value", (snapshot) => {
-    const record = snapshot.val();
-    if (record) {
-      let averageMoisture = Math.round((parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3) + '%';
-      record.averageMoisture = averageMoisture;            
-      let modalContent = `
-          <h3>Szczegóły</h3>
-          <p><strong>Numer seryjny:</strong> ${record.serialNumber}</p>
-          <p><strong>Gatunek:</strong> ${record.species}</p>
-          <p><strong>Typ:</strong> ${record.type}</p>
-          <p><strong>Średnia wilgotność:</strong> ${record.averageMoisture}</p>
-          <p><strong>Wysokość:</strong> ${record.height}</p>
-          <p><strong>Szerokość:</strong> ${record.width}</p>
-          <p><strong>Grubość:</strong> ${record.thickness}</p>
-          <p><strong>Średnica:</strong> ${record.diameter}</p>
-      `;
-
-      if (record.imageUrl) {
-        modalContent += `
-          <div id="zoom-cont" class="zoom-container"><img src="${record.imageUrl}" alt="Record Image" class="zoom-img" id="zoom-img" style="width:200px;"></div>
-        `;
-      }
-
-      showModalWithContent(modalContent);
-    } else {
-      console.error("Record not found or empty");
-    }
-  }).catch((error) => {
-    console.error("Error fetching record:", error);
-  });
-}
-
-function showModalWithContent(content) {
-  const modal = document.createElement("div");
-  modal.classList.add("modal");
-  modal.style.display = "block";
-  modal.innerHTML = `
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      ${content}
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  const closeModal = () => {
-    modal.style.display = "none";
-    modal.remove();
-  };
-
-  modal.querySelector(".close").addEventListener("click", closeModal);
-
-  window.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closeModal();
-    }
-  });
 }
 
 function likeBtn(event) {
@@ -218,7 +163,6 @@ function likeBtn(event) {
         console.error("Error adding to favorites:", error);
       });
   } else {
-  
     userFavoritesRef.remove()
       .then(() => {
         btn.classList.remove("fas");
@@ -233,3 +177,36 @@ function likeBtn(event) {
   }
 }
 
+function updateFavoritesCount() {
+  const userId = getCurrentUserId();
+
+  if (!userId) {
+    console.error("User is not logged in.");
+    return;
+  }
+
+  database.ref(`users/${userId}/favorites`).once('value', (snapshot) => {
+    const favorites = snapshot.val();
+    const count = favorites ? Object.keys(favorites).length : 0;
+    document.getElementById("favoritesCount").textContent = count;
+  }).catch((error) => {
+    console.error("Error updating favorites count:", error);
+  });
+}
+
+
+document.getElementById("searchInput").addEventListener("input", (event) => {
+  currentSearchQuery = event.target.value.trim().toLowerCase();
+  console.log("Updated searchQuery:", currentSearchQuery); // Debugging line
+  displayRecords();
+});
+
+document.getElementById("species-select").addEventListener("change", (event) => {
+  currentSpeciesFilter = event.target.value;
+  displayRecords();
+});
+
+document.getElementById("type-select").addEventListener("change", (event) => {
+  currentTypeFilter = event.target.value;
+  displayRecords();
+});

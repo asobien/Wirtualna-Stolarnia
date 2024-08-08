@@ -8,8 +8,6 @@ body {
     background-position:center;
     background-size: cover;
   }
-
-  /* Login container */
   
   .signup-container {
     background-color: #644b3c;
@@ -25,8 +23,6 @@ body {
     opacity: 0.9;
     box-shadow: 10px 10px 10px rgb(40, 38, 38);
   }
-  
-  /* Login inputs */
 
   input {
     border:none;
@@ -38,7 +34,6 @@ body {
     background-color: #dabba9;
   }
   
-
   .login-form {
     display: flex;
     flex-direction: column;
@@ -46,8 +41,6 @@ body {
     justify-content: center;
     align-items: center;
   }
-
-/*Login container title*/
 
   #title{
     color:rgb(198, 178, 159);

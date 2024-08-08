@@ -26,7 +26,7 @@
     <button class="filtr-btn" id="filtr-btn">Filtry</button>
   </div>
 
-  <div class="filters" style="color:rgb(219, 179, 127); display:flex; flex-direction:column; justify-content: left; margin:30px;">
+  <div class="filters" style="color:rgb(219, 179, 127); display:none; flex-direction:column; justify-content: left; margin:30px;">
     <label for="species-select">Gatunek: </label><select id="species-select" style="width:150px; height:30px; font-size: 15px; margin:10px; border-radius:8px;">
       <option value="Gatunek">Gatunek</option>
       <option value="Buk">Buk</option>
@@ -60,29 +60,32 @@
 
     <label>Średnia wilgonotść:</label>
     <div class="moisture-filter">
-      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
-      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Min: <input type="number" id="min-moisture" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-moisture" min="0" max="100" style="width:60px; margin:15px;"></label>
     </div>
 
     <label>Wysokość:</label>
     <div class="height-filter">
-      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
-      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Min: <input type="number" id="min-height" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-height" min="0" max="100" style="width:60px; margin:15px;"></label>
     </div>
 
     <label>Szerokość:</label>
     <div class="width-filter">
-      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
-      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Min: <input type="number" id="min-width" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-width" min="0" max="100" style="width:60px; margin:15px;"></label>
     </div>
 
     <label>Grubość:</label>
     <div class="thickness-filter">
-      <label>Min: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
-      <label>Max: <input type="number" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Min: <input type="number" id="min-thickness" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-thickness" min="0" max="100" style="width:60px; margin:15px;"></label>
     </div>
 
+
     <button id="submit-filters" class="submit-filters" style="width:100px; height:30px; border-radius:10px; border:none; background-color: #d9a377; font-size:15px;">Filtruj</button>
+    <button id="reset-filters" class="reset-filters" style="width:100px; height:30px; border-radius:10px; margin-top:10px; border:none; background-color: #d9a377; font-size:15px;">Resetuj</button>
+
     
   </div>
 
@@ -146,7 +149,7 @@
     };
   const app = firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
-  const auth = firebase.auth(); // Dodaj tę linię, aby zainicjalizować auth
+  const auth = firebase.auth(); 
   const storage = firebase.storage();
 
   

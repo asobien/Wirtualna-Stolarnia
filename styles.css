@@ -40,7 +40,7 @@ h1 {
   align-items:start;
   opacity: 0.88;
   box-shadow: 2px 3px 5px black;
-  width: 98%; /* Dostosuj szerokość do kontenera */
+  width: 98%; 
 }
 
 .record-info {
@@ -55,19 +55,19 @@ h1 {
 .checkbox-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Wyrównanie elementów do lewej strony */
+  align-items: flex-start; 
   padding: 0;
   margin: 0;
 }
 .checkbox-container label {
   display: flex;
   align-items: center;
-  margin-bottom: 10px; /* Odstęp między wierszami */
+  margin-bottom: 10px; 
   padding: 0;
   margin: 0;
 }
 .checkbox-container input[type="checkbox"] {
-  margin-right: 10px; /* Odstęp między input a napisem */
+  margin-right: 10px; 
 }
 .record-info strong{
   margin-right:5px;
@@ -86,14 +86,13 @@ h1 {
 
 .more {
   display: flex;
-  align-items: flex-start; /* Przycisk z informacją będzie na górze */
+  align-items: flex-start; 
   padding: 15px;
 }
 
 .record-buttons {
   display: flex;
 }
-
 
 .modal {
   display: none;
@@ -107,8 +106,6 @@ h1 {
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
-
-
 
 .input-btn {
   display: flex;
@@ -133,7 +130,6 @@ h1 {
 .edit-input{
   margin:7px;
 }
-
 
 input {
   width: 200px;
@@ -182,7 +178,6 @@ button {
   cursor: pointer;
 }
 
-
 .add-btn,
 .submit-btn,
 .login-btn {
@@ -199,18 +194,6 @@ button {
 .add-btn:hover{
   padding-right:20px;
 }
-
-/* .add-btn::after{
-  content: "➜";
-  position: absolute;
-  opacity: 0;
-  margin-left:18px;
-  top: 144px;
-}
-
-.add-btn:hover::after{
-  opacity:1;
-} */
 
 button:hover {
   transition: ease;

@@ -43,18 +43,15 @@
     recordRef.once("value", (snapshot) => {
       const record = snapshot.val();
       if (record) {
-        // Oblicz średnią wilgotność
         let averageMoisture = Math.round((parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3) + '%';
         record.averageMoisture = averageMoisture;
   
-        // Oblicz cenę
         let pricePromise = Promise.resolve(null);
         if (record.batch && record.volume) {
           pricePromise = calculateBoardPrice(record.volume, record.batch);
         }
   
         pricePromise.then((price) => {
-          // Zapisz cenę w bazie danych
           if (price !== null) {
             record.price = price;
             recordRef.update({ price: price });
@@ -209,23 +206,23 @@ function showModalWithContent(content) {
     const recordRef = database.ref("wood/" + recordId.toString());
     const partiesRef = database.ref("parties"); // Gałąź z partiami
   
-    // Pobierz rekord
+    
     recordRef.once("value", (snapshot) => {
       const record = snapshot.val();
       
-      // Pobierz partie
+      
       partiesRef.once("value", (partySnapshot) => {
         const parties = partySnapshot.val();
-        console.log("Parties data:", parties); // Debugowanie, aby sprawdzić pobrane dane
+        console.log("Parties data:", parties); 
   
         let partyOptions = "";
   
-        // Tworzenie opcji dla selecta z danymi z bazy
+    
         for (const partyId in parties) {
           if (parties.hasOwnProperty(partyId)) {
             const party = parties[partyId];
             const partyName = party.name || "Niezdefiniowana partia";
-            console.log(`Party ID: ${partyId}, Party Name: ${partyName}`); // Debugowanie
+            console.log(`Party ID: ${partyId}, Party Name: ${partyName}`);
             const selected = record.batch === partyId ? "selected" : "";
             partyOptions += `<option value="${partyName}" ${selected}>${partyName}</option>`;
           }
@@ -282,10 +279,9 @@ function showModalWithContent(content) {
               height: document.getElementById("editWoodHeight").value,
               width: document.getElementById("editWoodWidth").value,
               thickness: document.getElementById("editWoodThickness").value,
-              batch: document.getElementById("partySelect").value // Zaktualizowane ID selektora
+              batch: document.getElementById("partySelect").value 
             };
   
-            // Aktualizacja rekordu w bazie danych
             recordRef
               .update(editedRecord)
               .then(() => {
@@ -376,7 +372,7 @@ function showModalWithContent(content) {
     const woodHeight = parseFloat(document.getElementById("woodHeight").value);
     const woodWidth = parseFloat(document.getElementById("woodWidth").value);
     const woodThickness = parseFloat(document.getElementById("woodThickness").value);
-    const woodBatch = document.getElementById("woodBatch").value; // Nowe pole
+    const woodBatch = document.getElementById("woodBatch").value; 
     const file = document.getElementById("image").files[0];
 
     const recordCounterRef = database.ref("recordCounter");
@@ -393,7 +389,7 @@ function showModalWithContent(content) {
             const recordId = newRecordCounterValue;
             const volume = calculateVolume(woodHeight, woodWidth, woodThickness);
 
-            // Oblicz cenę deski, jeśli dostępne są dane o partii
+            
             let pricePromise = Promise.resolve(null);
             if (woodBatch && volume > 0) {
                 pricePromise = calculateBoardPrice(volume, woodBatch);
@@ -430,7 +426,7 @@ function showModalWithContent(content) {
                             storageRef
                                 .getDownloadURL()
                                 .then((url) => {
-                                    saveRecordToDatabase(url, recordId, volume, 0); // Ustaw cenę na 0, jeśli nie udało się obliczyć ceny
+                                    saveRecordToDatabase(url, recordId, volume, 0); 
                                 })
                                 .catch((error) => {
                                     console.error("Error getting image URL: ", error);
@@ -440,7 +436,7 @@ function showModalWithContent(content) {
                             console.error("Error uploading image: ", error);
                         });
                 } else {
-                    saveRecordToDatabase(null, recordId, volume, 0); // Ustaw cenę na 0, jeśli nie udało się obliczyć ceny
+                    saveRecordToDatabase(null, recordId, volume, 0); 
                 }
             });
         }
@@ -468,8 +464,8 @@ function showModalWithContent(content) {
                 width: woodWidth,
                 thickness: woodThickness,
                 volume: volume,
-                batch: woodBatch, // Dodano do bazy
-                price: price, // Dodano do bazy
+                batch: woodBatch, 
+                price: price, 
                 imageUrl: imageUrl,
             })
             .then(() => {
@@ -484,16 +480,16 @@ function showModalWithContent(content) {
     }
 
     function calculateVolume(height, width, thickness) {
-        return (parseFloat(height) * parseFloat(width) * parseFloat(thickness)) / 1000000; // Konwersja na m³
+        return (parseFloat(height) * parseFloat(width) * parseFloat(thickness)) / 1000000; 
     }
 }
 
 
 function calculateVolume(height, width, thickness) {
-    height = parseFloat(height) / 100; // Convert to meters
-    width = parseFloat(width) / 100;   // Convert to meters
-    thickness = parseFloat(thickness) / 100; // Convert to meters
-    return (height * width * thickness).toFixed(3); // Volume in cubic meters
+    height = parseFloat(height) / 100; 
+    width = parseFloat(width) / 100;   
+    thickness = parseFloat(thickness) / 100;
+    return (height * width * thickness).toFixed(3); 
 }
 
   
@@ -611,7 +607,7 @@ function loadBatches() {
                   const batch = batches[batchId];
                   const option = document.createElement("option");
                   option.value = batchId;
-                  option.text = batch.name; // Przy założeniu, że każda partia ma pole 'name'
+                  option.text = batch.name; 
                   batchSelect.add(option);
               }
           } else {
@@ -623,23 +619,23 @@ function loadBatches() {
       });
 }
 document.addEventListener("DOMContentLoaded", () => {
-  loadBatches(); // Załaduj partie po załadowaniu strony
+  loadBatches(); 
 });
 
 function calculateBoardPrice(volume, batchId) {
-  console.log("Calculating price for batch ID:", batchId); // Dodaj to logowanie
+  console.log("Calculating price for batch ID:", batchId); 
 
   return database.ref("batches/" + batchId).once("value").then((snapshot) => {
     const batch = snapshot.val();
-    console.log("Batch data:", batch); // Dodaj to logowanie
+    console.log("Batch data:", batch); 
 
     if (batch && batch.totalPrice) {
       const totalPrice = parseFloat(batch.totalPrice);
       if (volume > 0) {
-        return Math.round((totalPrice / volume) * 100) / 100; // Zaokrąglij do dwóch miejsc po przecinku
+        return Math.round((totalPrice / volume) * 100) / 100;
       } else {
         console.error("Objętość deski jest równa 0.");
-        return 0; // Jeśli objętość jest równa zero, cena to 0
+        return 0; 
       }
     } else {
       console.error("Brak danych o partii lub cena całkowita jest niepoprawna.");

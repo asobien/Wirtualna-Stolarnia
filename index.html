@@ -4,26 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wirtualna Stolarnia</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="W.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 <body>
 
-    <div class="signup-container">
-        <h2 id="title">Zarejestruj się</h2>
-        <input type="email" id="email" placeholder="E-mail">
-        <input type="password" id="password" placeholder="Hasło">
-        <input type="submit" id="signUp" value="Zarejestruj się" name="signup-submit" style="width:130px; font-size: 15px;">
-        <h3 id="title">Masz już konto? <a href="Login.html" style="color:rgb(197, 183, 164)">Zaloguj się tutaj</a></h3>
+  <menu style="position:fixed; width:100%; height:80px; background-color: rgb(201, 156, 108); z-index:1; margin:0 auto; display:flex; justify-content:space-between; align-items: center;">
+    <img src="logo.png" style="width:250px;">
+    <div>
+    <a href="favourites.html" style="margin-right:40px; text-decoration-line: none;">
+      <i class="fa-solid fa-heart fa-xl" style="color: #8c744a; margin-right:5px;"></i> <span id="favoritesCount">0</span>
+    </a>
+    <a href="Login.html" style="margin-right:70px; text-decoration-line: none; color: rgb(62, 26, 26);">Zaloguj się</a>
     </div>
-    
-</body>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, set, ref } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  </menu>
+  
 
-    const firebaseConfig = {
+<div class="container">
+  <h1>Wirtualna Stolarnia</h1>
+  <div class="input-btn">
+    <input type="text" id="searchInput" placeholder="Wyszukaj numer seryjny...">
+    <button class="filtr-btn" id="filtr-btn">Filtry</button>
+  </div>
+
+  <div class="filters" style="color:rgb(219, 179, 127); display:none; flex-direction:column; justify-content: left; margin:30px;">
+    <label for="species-select">Gatunek: </label><select id="species-select" style="width:150px; height:30px; font-size: 15px; margin:10px; border-radius:8px;">
+      <option value="Gatunek">Gatunek</option>
+      <option value="Buk">Buk</option>
+      <option value="Czereśnia">Czereśnia</option>
+      <option value="Dąb">Dąb</option>
+      <option value="Głóg">Głóg</option>
+      <option value="Jabłoń">Jabłoń</option>
+      <option value="Jesion">Jesion</option>
+      <option value="Klon Polny">Klon Polny</option>
+      <option value="Lipa">Lipa</option>
+      <option value="Modrzew">Modrzew</option>
+      <option value="Olcha">Olcha</option>
+      <option value="Sosna">Sosna</option>
+      <option value="Świerk">Świerk</option>
+      <option value="Akacja">Akacja</option>
+      <option value="Topola">Topola</option>
+      <option value="Dąb Czerwony">Dąb Czerwony</option>
+      <option value="Czereśnia dzika">Czereśnia dzika</option>
+    </select>
+
+    <label for="type-select">Typ: </label><select id="type-select" style="width:150px; height:30px; font-size: 15px; margin:10px; border-radius:8px;">
+      <option value="Typ">Typ</option>
+      <option value="Deska">Deska</option>
+      <option value="Plaster">Plaster</option>
+      <option value="Inne">Inne</option>
+      <option value="Belka">Belka</option>
+      <option value="Monolit">Monolit</option>
+      <option value="Czeczota">Czeczota</option>
+      <option value="Krążek">Krążek</option>
+    </select>
+
+    <label>Średnia wilgonotść:</label>
+    <div class="moisture-filter">
+      <label>Min: <input type="number" id="min-moisture" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-moisture" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <label>Wysokość:</label>
+    <div class="height-filter">
+      <label>Min: <input type="number" id="min-height" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-height" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <label>Szerokość:</label>
+    <div class="width-filter">
+      <label>Min: <input type="number" id="min-width" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-width" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+    <label>Grubość:</label>
+    <div class="thickness-filter">
+      <label>Min: <input type="number" id="min-thickness" min="0" max="100" style="width:60px; margin:15px;"></label>
+      <label>Max: <input type="number" id="max-thickness" min="0" max="100" style="width:60px; margin:15px;"></label>
+    </div>
+
+
+    <button id="submit-filters" class="submit-filters" style="width:100px; height:30px; border-radius:10px; border:none; background-color: #d9a377; font-size:15px;">Filtruj</button>
+    <button id="reset-filters" class="reset-filters" style="width:100px; height:30px; border-radius:10px; margin-top:10px; border:none; background-color: #d9a377; font-size:15px;">Resetuj</button>
+
+    
+  </div>
+
+  <div id="records" class="record-container"></div>
+</div>
+
+<div id="addRecordModal1" class="modal">
+    <div class="modal-content">
+      <span class="close" style="display: none;">&times;</span>
+        <form id="addRecordForm">
+          <label>Numer seryjny:<input class="form_input" type="text" id="woodSerialNumber" placeholder="Numer Seryjny" required></label>
+          <label>Nazwa:<input class="form_input" type="text" id="woodName" placeholder="Nazwa"></label>
+          <label>Gatunek<input class="form_input" type="text" id="woodSpecies" placeholder="Gatunek" style="display: none;"></label>
+          <!-- <label>Typ:<input list="Types" class="form_input" type="text" id="woodType" placeholder="Typ (P lub D)" style="display: none;"></label> -->
+            <label for="select">Typ:<select name="typ" style="width:200px; border-radius:10px; height:30px; padding:5px;" id="woodType">
+              <option>Wybierz opcję</option>
+              <option value="Deska">Deska</option>
+              <option value="Plaster">Plaster</option>
+            </select></label>
+            <label>Kształt:<input class="form_input" type="text" id="woodShape" placeholder="Kształt" style="display: none;"></label>
+            <label>Data Zakupu:<input class="form_input" type="text" id="woodPurchaseDate" placeholder="Data Zakupu" style="display: none;"></label>
+            <label>Zakupione od:<input class="form_input" type="text" id="woodPurchasedFrom" placeholder="Zakupione od" style="display: none;"></label>
+            <label>Rok ścięcia:<input class="form_input" type="text" id="woodYearCut" placeholder="Rok Ścięcia" style="display: none;"></label>
+            <!-- <label>Wilgotność 1:<input class="form_input" type="text" id="woodMoisture1" placeholder="Wilgotność 1 (%)" style="display: none;"></label> -->
+            <!-- <label>Wilgotność 2:<input class="form_input" type="text" id="woodMoisture2" placeholder="Wilgotność 2 (%)" style="display: none;"></label> -->
+            <!-- <label>Wilgotność 3:<input class="form_input" type="text" id="woodMoisture3" placeholder="Wilgotność 3 (%)" style="display: none;"></label> -->
+            <!-- <label>Osoba mierząca:<input class="form_input" type="text" id="woodMeasurer" placeholder="Osoba mierząca" style="display: none;"></label> -->
+            <!-- <label>Wilgotnościomierz:<input class="form_input" type="text" id="woodMoistureMeter" placeholder="Wilgotnościomierz" style="display: none;"></label> -->
+            <label>Wysokość:<input class="form_input" type="text" id="woodHeight" placeholder="Wysokość" style="display: none;"></label>
+            <label>Szerokość:<input class="form_input" type="text" id="woodWidth" placeholder="Szerokość" style="display: none;"></label>
+            <label>Grubość:<input class="form_input" type="text" id="woodThickness" placeholder="Grubość" style="display: none;"></label>
+            <label>Średnica:<input class="form_input" type="text" id="woodDiameter" placeholder="Średnica" style="display: none;"></label>
+            <label for="woodBatch">Partia:</label>
+    <select id="woodBatch" name="woodBatch">
+        <!-- Opcje będą dynamicznie wypełniane z bazy danych -->
+    </select>
+            <label>Zdjęcie poglądowe:<input type="file" class="form_input" id="image" style="display: none; border:none;"></label>
+            <button class="submit-btn" type="submit" style="display: none;">Dodaj rekord</button>
+        </form>
+    </div>
+</div>
+
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+  <script src="user_script.js"></script>
+
+<script>
+ const firebaseConfig = {
       apiKey: "AIzaSyB8gGTd9l9-OFjJRJTaKwpbvO18cirEXCI",
       authDomain: "wirtualna-stolarnia-7df3c.firebaseapp.com",
       databaseURL: "https://wirtualna-stolarnia-7df3c-default-rtdb.europe-west1.firebasedatabase.app",
@@ -33,30 +148,14 @@
       appId: "1:910342092496:web:bccff19f3df925ec8e10d5",
       measurementId: "G-GHT85THHVZ"
     };
+  const app = firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const auth = firebase.auth(); 
+  const storage = firebase.storage();
 
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    const auth = getAuth();
-
-    signUp.addEventListener('click', (e) => {
-        let email = document.getElementById('email').value 
-        let password = document.getElementById('password').value
-
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            set(ref(database, 'users/' + user.uid),{
-                email: email,
-                password: password,
-                role: 'user'
-            })
-            alert('Użytkownik utworzony!')
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            alert(errorMessage)
-        });
-    });
+  
 </script>
+
+<script src="user_script.js"></script>
+</body>
 </html>

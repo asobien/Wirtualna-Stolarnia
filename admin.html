@@ -11,6 +11,7 @@
 <body>
     <menu style="position:fixed; width:100%; height:80px; background-color: rgb(201, 156, 108); z-index:1; margin:0 auto; display:flex; justify-content: space-between; align-items: center;">
         <img src="logo.png" style="width:250px;">
+        <a href="partie.html" style="margin-right:80px; text-decoration-line: none; color:black; font-size:20px;">Partie</a>
       </menu>
 
       <div class="container">
@@ -29,8 +30,9 @@
     <div id="addRecordModal" class="modal">
         <div class="modal-content">
           <span class="close" style="display: none;">&times;</span>
-            <form id="addRecordForm">
-                <input class="form_input" type="text" id="woodSerialNumber" placeholder="Numer Seryjny" required>
+          <p>Dodaj rekord</p>
+          <form id="addRecordForm" onsubmit="addRecord(event)">
+            <input class="form_input" type="text" id="woodSerialNumber" placeholder="Numer Seryjny" required>
                 <input class="form_input" type="text" id="woodName" placeholder="Nazwa" required>
                 <input class="form_input" type="text" id="woodSpecies" placeholder="Gatunek" style="display: none;">
                 <input class="form_input" type="text" id="woodType" placeholder="Typ (P lub D)" style="display: none;">
@@ -46,17 +48,33 @@
                 <input class="form_input" type="text" id="woodHeight" placeholder="Wysokość" style="display: none;">
                 <input class="form_input" type="text" id="woodWidth" placeholder="Szerokość" style="display: none;">
                 <input class="form_input" type="text" id="woodThickness" placeholder="Grubość" style="display: none;">
+                <label for="woodBatch">Partia:</label>
+    <select id="woodBatch" name="woodBatch">
+        <!-- Opcje będą dynamicznie wypełniane z bazy danych -->
+    </select>
                 <input type="file" class="form_input" id="image" style="display: none; border:none;">
                 <button class="submit-btn" type="submit" style="display: none;">Dodaj rekord</button>
             </form>
         </div>
     </div>
-    
-    <div class="addPartiaModal">
+
+    <div id="addPartiaModal" class="addPartiaModal">
       <div class="partia-modal-content">
-        <span class="closeModal"></span>
+          <span class="closeModal" id="closePartiaModal" style="cursor:pointer;">&times;</span>
+          <p>Dodaj partię</p>
+          <form id="partiaForm" style="display:flex; flex-direction: column;">
+            <label>Nazwa partii:<input type="text" class="partia-input" id="partia-name" placeholder="Nazwa partii"></label>
+            <label>Data zakupu: <input type="date" class="partia-input" id="partia-date" placeholder="Data zakupu"></label>
+            <label>Cena zakupu: <input type="number" class="partia-input" id="partia-price" placeholder="Cena zakupu" min="0" step="0.01"></label>
+            <label>Koszt transportu: <input type="number" class="partia-input" id="partia-trans-price" placeholder="Koszt transportu"></label>
+            <label>Rozpakowanie: <input type="number" class="partia-input" id="partia-sign-price" placeholder="Koszty rozpakowania"></label>
+            <button type="submit" class="submit-btn">Dodaj partię</button>
+
+          </form>   
       </div>
-    </div>
+  </div>
+  
+    
 
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>

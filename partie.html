@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wirtualna Stolarnia</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="./W.png">
+</head>
+<body>
+    <menu style="position:fixed; width:100%; height:80px; background-color: rgb(201, 156, 108); z-index:1; margin:0 auto; display:flex; justify-content: space-between; align-items: center;">
+        <img src="logo.png" style="width:250px;">
+        <a href="partie.html" style="margin-right:80px; text-decoration-line: none; color:black; font-size:20px;">Partie</a>
+      </menu>
+
+      <div class="container">
+        <h1>Wirtualna Stolarnia</h1>
+        <h2 style="color:rgb(212, 180, 140)">Partie</h2>
+        <div class="partie-display" id="partieDisplay" style="color:rgb(72, 56, 37); width:96%; background-color: rgb(201, 156, 108); border-radius:10px; padding:20px;"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+    <script src="script.js"></script>
+    <script src="partie-script.js"></script>
+  
+  <script>
+   const firebaseConfig = {
+        apiKey: "AIzaSyB8gGTd9l9-OFjJRJTaKwpbvO18cirEXCI",
+        authDomain: "wirtualna-stolarnia-7df3c.firebaseapp.com",
+        databaseURL: "https://wirtualna-stolarnia-7df3c-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "wirtualna-stolarnia-7df3c",
+        storageBucket: "wirtualna-stolarnia-7df3c.appspot.com",
+        messagingSenderId: "910342092496",
+        appId: "1:910342092496:web:bccff19f3df925ec8e10d5",
+        measurementId: "G-GHT85THHVZ"
+      };
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+  
+    
+  </script>
+</body>
+</html>

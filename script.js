@@ -298,8 +298,6 @@ function showModalWithContent(content) {
     });
   }
   
-  
-
   function closeModal() {
   const modal = document.querySelector(".modal");
   if (modal) {

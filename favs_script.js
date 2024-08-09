@@ -1,63 +1,74 @@
-let userFavorites = JSON.parse(localStorage.getItem('favorites')) || {};
-console.log("Pobrane dane z localStorage:", userFavorites);
+function getCurrentUserId() {
+  const user = auth.currentUser;
+  return user ? user.uid : null;
+}
+
+let userFavorites = {};
+
+
+function initializeApp() {
+  document.addEventListener("DOMContentLoaded", () => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        updateFavoritesCount(); 
+        displayFavoriteRecordsOnly(); 
+      }
+    });
+  });
+}
 
 function displayFavoriteRecordsOnly() {
-  console.log("Wywołano displayFavoriteRecordsOnly");
   const recordsContainer = document.getElementById("favourite-records");
-  if (!recordsContainer) {
-      console.error("Element o ID 'favourite-records' nie został znaleziony");
-      return;
-  }
   recordsContainer.innerHTML = "";
-}
-  database.ref("wood").once("value", (snapshot) => {
-    console.log("Pobrane dane z bazy:", snapshot.val());
-    snapshot.forEach((childSnapshot) => {
+
+  const userId = getCurrentUserId();
+  if (!userId) {
+    console.error("User is not logged in.");
+    return;
+  }
+  
+  database.ref(`users/${userId}/favorites`).once('value', (favoritesSnapshot) => {
+    const favorites = favoritesSnapshot.val() || {};
+
+    database.ref("wood").once("value", (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
         const record = childSnapshot.val();
-        if (userFavorites[record.serialNumber]) {
-            console.log("Dodano ulubiony produkt:", record);
-            const recordDiv = createRecordElement(record, childSnapshot.key);
-            recordsContainer.appendChild(recordDiv);
+        if (favorites[record.serialNumber]) {
+          const recordDiv = createRecordElement(record, childSnapshot.key);
+          recordsContainer.appendChild(recordDiv);
         }
+      });
     });
-});
-
-
-
-
+  }).catch((error) => {
+    console.error("Error fetching user favorites:", error);
+  });
+}
 
 function createRecordElement(record, key) {
   const recordDiv = document.createElement("div");
   recordDiv.classList.add("record");
-
   let averageMoisture = Math.round((parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3) + '%';
   record.averageMoisture = averageMoisture;
-
   recordDiv.innerHTML = `
-    <div class="record-info">
-      <span class="record-item"><strong>Numer Seryjny:</strong> ${record.serialNumber}</span>
-      <span class="record-item"><strong>Gatunek:</strong> ${record.species}</span>
-      <span class="record-item"><strong>Typ:</strong> ${record.type}</span>
-      <span class="record-item"><strong>Średnia wilgotność: </strong> ${record.averageMoisture}</span>
-      <span class="record-item"><strong>Wysokość: </strong> ${record.height}</span>
-      <span class="record-item"><strong>Szerokość: </strong> ${record.width}</span>
-      <span class="record-item"><strong>Grubość: </strong> ${record.thickness}</span>
+  <div class="record-info">
+    <span class="record-item"><strong>Numer Seryjny:</strong> ${record.serialNumber}</span> 
+    <span class="record-item"><strong>Gatunek:</strong> ${record.species}</span> 
+    <span class="record-item"><strong>Typ:</strong> ${record.type}</span>
+    <span class="record-item"><strong>Średnia wilgotność: </strong> ${record.averageMoisture}</span>
+    <span class="record-item"><strong>Wysokość: </strong> ${record.height}</span>
+    <span class="record-item"><strong>Szerokość: </strong> ${record.width}</span>
+    <span class="record-item"><strong>Grubość: </strong> ${record.thickness}</span>
     </div>
-    <div id="zoom-cont" class="zoom-container">
-      <img src="${record.imageUrl}" alt="Record Image" class="zoom-img" id="zoom-img" style="width:200px;">
-    </div>
+    <div id="zoom-cont" class="zoom-container"><img src="${record.imageUrl}" alt="Record Image" class="zoom-img" id="zoom-img" style="width:200px;"></div>
     <div class="more">
       <div id="record-menu" class="record-buttons">
         <button class="details-btn" data-id="${key}">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">
+          </svg>
         </button>
         <div class="wrapper">
           <span>
-            <i class="fas fa-heart fa-2xl ${userFavorites[record.serialNumber] ? 'fas' : 'far'}" 
-               onclick="likeBtn(event)" 
-               data-serial-number="${record.serialNumber}" 
-               style="margin-top:15px; margin-left:15px; cursor:pointer;">
-            </i>
+            <i class="fas fa-heart fa-2xl ${userFavorites[record.serialNumber] ? 'fas' : 'far'}" onclick="likeBtn(event)" data-serial-number="${record.serialNumber}" style="margin-top:15px; margin-left:15px; cursor:pointer;"></i>
           </span>
         </div>
       </div>
@@ -78,8 +89,7 @@ function showDetailsModal(recordId) {
     const record = snapshot.val();
     if (record) {
       let averageMoisture = Math.round((parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3) + '%';
-      record.averageMoisture = averageMoisture;
-
+      record.averageMoisture = averageMoisture;            
       let modalContent = `
           <h3>Szczegóły</h3>
           <p><strong>Numer seryjny:</strong> ${record.serialNumber}</p>
@@ -89,6 +99,7 @@ function showDetailsModal(recordId) {
           <p><strong>Wysokość:</strong> ${record.height}</p>
           <p><strong>Szerokość:</strong> ${record.width}</p>
           <p><strong>Grubość:</strong> ${record.thickness}</p>
+          <p><strong>Średnica:</strong> ${record.diameter}</p>
       `;
 
       if (record.imageUrl) {
@@ -105,6 +116,7 @@ function showDetailsModal(recordId) {
     console.error("Error fetching record:", error);
   });
 }
+
 
 function showModalWithContent(content) {
   const modal = document.createElement("div");
@@ -133,42 +145,58 @@ function showModalWithContent(content) {
   });
 }
 
-function likeBtn(event) {
-  const serialNumber = event.target.getAttribute("data-serial-number");
-  const isLiked = userFavorites[serialNumber];
 
-  if (isLiked) {
-    delete userFavorites[serialNumber];
-    event.target.classList.remove("fas");
-    event.target.classList.add("far");
-  } else {
-    userFavorites[serialNumber] = true;
-    event.target.classList.remove("far");
-    event.target.classList.add("fas");
+function likeBtn(event) {
+  const userId = getCurrentUserId();
+  if (!userId) {
+    console.error("User is not logged in.");
+    return;
   }
 
-  localStorage.setItem('favorites', JSON.stringify(userFavorites));
-  updateFavoritesCount();
+  const serialNumber = event.target.getAttribute("data-serial-number");
+  const isLiked = event.target.classList.contains("fas");
+
+  if (isLiked) {
+    database.ref(`users/${userId}/favorites/${serialNumber}`).remove()
+      .then(() => {
+        event.target.classList.remove("fas");
+        event.target.classList.add("far");
+        updateFavoritesCount();
+      })
+      .catch((error) => {
+        console.error("Error removing favorite:", error);
+      });
+  } else {
+    const newFavorite = {};
+    newFavorite[serialNumber] = true;
+    database.ref(`users/${userId}/favorites`).update(newFavorite)
+      .then(() => {
+        event.target.classList.remove("far");
+        event.target.classList.add("fas");
+        updateFavoritesCount();
+      })
+      .catch((error) => {
+        console.error("Error adding favorite:", error);
+      });
+  }
 }
+
 
 function updateFavoritesCount() {
-  const count = Object.keys(userFavorites).length;
-  document.getElementById("favoritesCount").textContent = count;
-}
+  const userId = getCurrentUserId();
+  if (!userId) {
+    console.error("User is not logged in.");
+    return;
+  }
 
-initializeApp();
-
-
-function initializeApp() {
-  document.addEventListener("DOMContentLoaded", () => {
-      console.log("userFavorites zawartość:", userFavorites);
-
-      const currentPage = window.location.pathname.split("/").pop(); 
-      if (currentPage === 'favourites.html') {
-          displayFavoriteRecordsOnly();  
-      } else {
-          updateFavoritesCount();
-      }
+  database.ref(`users/${userId}/favorites`).once('value', (favoritesSnapshot) => {
+    const favorites = favoritesSnapshot.val() || {};
+    const count = Object.keys(favorites).length;
+    document.getElementById("favoritesCount").textContent = count;
+  }).catch((error) => {
+    console.error("Error fetching user favorites count:", error);
   });
 }
 
+
+initializeApp();

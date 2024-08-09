@@ -1,8 +1,16 @@
 let currentSort = null;
 let currentSearchQuery = '';
-let currentSpeciesFilter = 'Gatunek';
-let currentTypeFilter = 'Typ'; 
+let currentSpeciesFilter = 'Gatunek'; // Gatunek, który ma być filtrowany
+let currentTypeFilter = 'Typ'; // Typ, który ma być filtrowany
 let userFavorites = {};
+let minMoisture = null;
+let maxMoisture = null;
+let minHeight = null;
+let maxHeight = null;
+let minWidth = null;
+let maxWidth = null;
+let minThickness = null;
+let maxThickness = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   auth.onAuthStateChanged((user) => {
@@ -26,6 +34,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("type-select").addEventListener("change", (event) => {
     currentTypeFilter = event.target.value;
+    displayRecords();
+  });
+
+  document.getElementById("submit-filters").addEventListener("click", (event) => {
+    event.preventDefault();
+    
+    minMoisture = parseInt(document.querySelector('.moisture-filter input:nth-child(1)').value) || null;
+    maxMoisture = parseInt(document.querySelector('.moisture-filter input:nth-child(3)').value) || null;
+    minHeight = parseInt(document.querySelector('.height-filter input:nth-child(1)').value) || null;
+    maxHeight = parseInt(document.querySelector('.height-filter input:nth-child(3)').value) || null;
+    minWidth = parseInt(document.querySelector('.width-filter input:nth-child(1)').value) || null;
+    maxWidth = parseInt(document.querySelector('.width-filter input:nth-child(3)').value) || null;
+    minThickness = parseInt(document.querySelector('.thickness-filter input:nth-child(1)').value) || null;
+    maxThickness = parseInt(document.querySelector('.thickness-filter input:nth-child(3)').value) || null;
+
+    displayRecords();
+  });
+
+  document.getElementById("reset-filters").addEventListener("click", () => {
+    // Reset search input
+    document.getElementById("searchInput").value = '';
+    currentSearchQuery = '';
+
+    // Reset species filter
+    document.getElementById("species-select").value = 'Gatunek';
+    currentSpeciesFilter = 'Gatunek';
+
+    // Reset type filter
+    document.getElementById("type-select").value = 'Typ';
+    currentTypeFilter = 'Typ';
+
+    // Reset range filters
+    document.querySelectorAll('.moisture-filter input').forEach(input => input.value = '');
+    document.querySelectorAll('.height-filter input').forEach(input => input.value = '');
+    document.querySelectorAll('.width-filter input').forEach(input => input.value = '');
+    document.querySelectorAll('.thickness-filter input').forEach(input => input.value = '');
+    
+    minMoisture = null;
+    maxMoisture = null;
+    minHeight = null;
+    maxHeight = null;
+    minWidth = null;
+    maxWidth = null;
+    minThickness = null;
+    maxThickness = null;
+
+    // Re-display all records
     displayRecords();
   });
 });
@@ -56,16 +111,8 @@ function filterRecords(recordsArray) {
     species: currentSpeciesFilter,
     type: currentTypeFilter,
     searchQuery: currentSearchQuery,
+    minMoisture, maxMoisture, minHeight, maxHeight, minWidth, maxWidth, minThickness, maxThickness
   });
-
-  const minMoisture = parseFloat(document.getElementById("min-moisture").value) || 0;
-  const maxMoisture = parseFloat(document.getElementById("max-moisture").value) || 100;
-  const minHeight = parseFloat(document.getElementById("min-height").value) || 0;
-  const maxHeight = parseFloat(document.getElementById("max-height").value) || 100;
-  const minWidth = parseFloat(document.getElementById("min-width").value) || 0;
-  const maxWidth = parseFloat(document.getElementById("max-width").value) || 100;
-  const minThickness = parseFloat(document.getElementById("min-thickness").value) || 0;
-  const maxThickness = parseFloat(document.getElementById("max-thickness").value) || 100;
 
   return recordsArray.filter(record => {
     const speciesMatch = currentSpeciesFilter === 'Gatunek' || record.species === currentSpeciesFilter;
@@ -73,13 +120,19 @@ function filterRecords(recordsArray) {
     const searchQueryMatch = currentSearchQuery === '' ||
       (record.name && record.name.toLowerCase().includes(currentSearchQuery)) ||
       (record.serialNumber && record.serialNumber.toLowerCase().includes(currentSearchQuery));
-    
-    const averageMoisture = (parseFloat(record.moisture1) + parseFloat(record.moisture2) + parseFloat(record.moisture3)) / 3;
-    const moistureMatch = averageMoisture >= minMoisture && averageMoisture <= maxMoisture;
-    const heightMatch = parseFloat(record.height) >= minHeight && parseFloat(record.height) <= maxHeight;
-    const widthMatch = parseFloat(record.width) >= minWidth && parseFloat(record.width) <= maxWidth;
-    const thicknessMatch = parseFloat(record.thickness) >= minThickness && parseFloat(record.thickness) <= maxThickness;
 
+    const moistureMatch = (!minMoisture || parseFloat(record.averageMoisture) >= minMoisture) &&
+                          (!maxMoisture || parseFloat(record.averageMoisture) <= maxMoisture);
+
+    const heightMatch = (!minHeight || parseFloat(record.height) >= minHeight) &&
+                        (!maxHeight || parseFloat(record.height) <= maxHeight);
+
+    const widthMatch = (!minWidth || parseFloat(record.width) >= minWidth) &&
+                       (!maxWidth || parseFloat(record.width) <= maxWidth);
+
+    const thicknessMatch = (!minThickness || parseFloat(record.thickness) >= minThickness) &&
+                           (!maxThickness || parseFloat(record.thickness) <= maxThickness);
+    
     console.log(`Record ${record.serialNumber} matches filters:`, {
       speciesMatch,
       typeMatch,
@@ -93,6 +146,7 @@ function filterRecords(recordsArray) {
     return speciesMatch && typeMatch && searchQueryMatch && moistureMatch && heightMatch && widthMatch && thicknessMatch;
   });
 }
+
 
 document.getElementById("submit-filters").addEventListener("click", displayRecords);
 
@@ -173,7 +227,6 @@ function createRecordElement(record, key) {
         </button>
         <div class="wrapper">
           <span>
-            <i class="far fa-heart fa-2xl ${userFavorites[record.serialNumber] ? 'fas' : 'far'}" onclick="likeBtn(event)" data-serial-number="${record.serialNumber}" style="margin-top:15px; margin-left:15px; cursor:pointer;"></i>
           </span>
         </div>
       </div>
@@ -244,18 +297,21 @@ document.getElementById('filtr-btn').addEventListener('click', toggleFilters);
 
 function updateFavoritesCount() {
   const userId = getCurrentUserId();
-
   if (!userId) {
     console.error("User is not logged in.");
     return;
   }
 
   database.ref(`users/${userId}/favorites`).once('value', (snapshot) => {
-    const favorites = snapshot.val();
-    const count = favorites ? Object.keys(favorites).length : 0;
-    document.getElementById("favoritesCount").textContent = count;
+    const favorites = snapshot.val() || {};
+    const favoritesCount = Object.keys(favorites).length;
+    const favoritesCountElement = document.getElementById("favorites-count");
+
+    if (favoritesCountElement) {
+      favoritesCountElement.textContent = favoritesCount;
+    }
   }).catch((error) => {
-    console.error("Error updating favorites count:", error);
+    console.error("Error fetching favorites count:", error);
   });
 }
 
